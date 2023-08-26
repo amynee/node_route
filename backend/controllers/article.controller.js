@@ -1,16 +1,16 @@
-const ArticleModel = require('../models/article.model');
+const articleService = require('../services/article.service');
 
-module.exports.getArticles = async (req, res) => {
+const getArticles = async (req, res) => {
     let filter = {};
     let limit;
     // Get filter fields if exist
     if (req.query.filter) {
-    try {
-        // Convert string to json
-        filter = JSON.parse(req.query.filter);
-    } catch (error) {
-        return res.status(400).send("Invalid filter format");
-    }
+        try {
+            // Convert string to json
+            filter = JSON.parse(req.query.filter);
+        } catch (error) {
+            return res.status(400).send("Invalid filter format");
+        }
     }
 
     // Get limit attribute if exist
@@ -19,42 +19,49 @@ module.exports.getArticles = async (req, res) => {
     };
 
     // Get articles
-    await ArticleModel.find(filter)
-      .limit(limit)
-      .then((articles) => {
+    try {
+        const articles = await articleService.getArticles(filter, limit);
+
         res.status(200).json({
             success: true,
             length: articles.length,
             articles
-          });
-       }).catch((error) => {
-            res.status(500).send(error);
-       });
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
 }
 
-module.exports.setArticle = async (req, res) => {
+const setArticle = async (req, res) => {
     // Check if all data is exist
-    const {name, content, date} = {...req.body};
+    const {name, content, date} = req.body;
     if (!name || !content || !date) {
         res.status(400).json({
             error:  true,
-            error_message: 'Some fields are missing. '
+            error_code: 400,
+            error_message: 'Some fields are missing.'
         });
     } else {
         try {
             // Insert article data
-            const article = await ArticleModel.create({
-                name: req.body.name,
-                content: req.body.content,
-                date: req.body.date
+            const article = await articleService.createArticle({
+                name,
+                content,
+                date
             });
     
-            res.status(200).json(article);
+            res.status(201).json(article);
         }  catch (error) {
             res.status(404).json({
                 error: true,
+                error_code: 404,
                 error_message: error.message
             });
         }
     }
+};
+
+module.exports = {
+    getArticles,
+    setArticle
 };
