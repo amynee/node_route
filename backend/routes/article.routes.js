@@ -1,15 +1,12 @@
 const express = require('express');
+const { setArticle, getArticles } = require('../controllers/article.controller');
 
 const router = express.Router();
 
 // Create the GET endpoint
-router.get('/', (req, res) => {
-    res.status(200).send({message: 'get worked!!'})
-});
+router.get('/', getArticles);
 
 // Create the POST endpoint
-router.post('/', (req, res) => {
-    res.status(200).send({message: 'post worked!!'})
-});
+router.post('/', setArticle);
 
 module.exports = router;
