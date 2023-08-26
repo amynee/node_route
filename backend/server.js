@@ -21,5 +21,5 @@ app.use('/articles', require('./routes/article.routes'));
 
 // Set the app to listen to port 5000
 app.listen(port, () => {
-    console.log(`Le serveur a démarré au port ${port}`);
+    console.log(`Server started on port ${port}`);
 });
